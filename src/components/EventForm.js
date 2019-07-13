@@ -2,26 +2,31 @@ import React from 'react';
 import moment from 'moment';
 import { SingleDatePicker } from 'react-dates';
 
-export default class ExpenseForm extends React.Component {
+export default class EventForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      description: props.expense ? props.expense.description : '',
-      note: props.expense ? props.expense.note : '',
-      amount: props.expense ? (props.expense.amount / 100).toString() : '',
-      createdAt: props.expense ? moment(props.expense.createdAt) : moment(),
+      name: props.event ? props.event.name : '',
+      description: props.event ? props.event.description : '',
+      symptoms: props.event ? props.event.symptoms : '',
+      temperature: props.event ? (props.event.amount / 100).toString() : '',
+      createdAt: props.event ? moment(props.event.createdAt) : moment(),
       calendarFocused: false,
       error: ''
     };
   }
+  onNameChange = (e) => {
+    const name = e.target.value;
+    this.setState(() => ({ name }));
+  };
   onDescriptionChange = (e) => {
     const description = e.target.value;
     this.setState(() => ({ description }));
   };
-  onNoteChange = (e) => {
-    const note = e.target.value;
-    this.setState(() => ({ note }));
+  onSymptomChange = (e) => {
+    const symptoms = e.target.value;
+    this.setState(() => ({ symptoms }));
   };
   onAmountChange = (e) => {
     const amount = e.target.value;
@@ -41,15 +46,16 @@ export default class ExpenseForm extends React.Component {
   onSubmit = (e) => {
     e.preventDefault();
 
-    if (!this.state.description || !this.state.amount) {
-      this.setState(() => ({ error: 'Please provide description and amount.' }));
+    if (!this.state.description || !this.state.name) {
+      this.setState(() => ({ error: 'Please provide a name and description.' }));
     } else {
       this.setState(() => ({ error: '' }));
       this.props.onSubmit({
+        name: this.state.name,
         description: this.state.description,
-        amount: parseFloat(this.state.amount, 10) * 100,
+        symptoms: this.state.symptoms,
+        amount: this.state.temperature,
         createdAt: this.state.createdAt.valueOf(),
-        note: this.state.note
       });
     }
   };
@@ -59,8 +65,15 @@ export default class ExpenseForm extends React.Component {
         {this.state.error && <p className="form__error">{this.state.error}</p>}
         <input
           type="text"
-          placeholder="Description"
+          placeholder="Name"
           autoFocus
+          className="text-input"
+          value={this.state.name}
+          onChange={this.onNameChange}
+        />
+        <input
+          type="text"
+          placeholder="Description"
           className="text-input"
           value={this.state.description}
           onChange={this.onDescriptionChange}
@@ -81,14 +94,14 @@ export default class ExpenseForm extends React.Component {
           isOutsideRange={() => false}
         />
         <textarea
-          placeholder="Add a note for your expense (optional)"
+          placeholder="Add any symptoms here (optional)"
           className="textarea"
-          value={this.state.note}
-          onChange={this.onNoteChange}
+          value={this.state.symptoms}
+          onChange={this.onSymptomChange}
         >
         </textarea>
         <div>
-          <button className="button">Save Expense</button>
+          <button className="button">Save Event</button>
         </div>
       </form>
     )
